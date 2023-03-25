@@ -1,8 +1,6 @@
 name: test-demo
 run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
-on:
-  issue_comment:
-    types: [created]
+on: issue_comment
     
 jobs:
   i_issues_job:
