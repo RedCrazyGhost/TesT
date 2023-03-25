@@ -5,7 +5,7 @@ on: issue_comment
 jobs:
   i_issues_job:
     runs-on: ubuntu-latest
-    if: ${{ !github.event.issue.pull_request }}
+    if:  ${{ !github.event.issue.pull_request }}
     name: issues_job
     steps:
       - run: |
