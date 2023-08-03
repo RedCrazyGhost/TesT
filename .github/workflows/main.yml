@@ -15,6 +15,13 @@ jobs:
         echo "Issue title: ${{ github.event.issue.title }}"
         echo "Issue body: ${{ github.event.issue.body }}"
 
+    # 修改文件readme.md 然后push到仓库
+    # - uses: actions/checkout@v3
+    # - run: |
+    #     git config --global user.email "bot@redcrazyghost.vip"
+    #     git config --global user.name "[bot]"
+
+# 删除不是作者发布Issues
   # Delete:
   #   runs-on: ubuntu-latest
   #   timeout-minutes: 10
