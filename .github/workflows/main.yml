@@ -1,11 +1,23 @@
-name: 'Get Issues'
+name: 'Auto Issues'
+
+env:
+  TZ: Asia/Shanghai
 
 on: issues
 jobs:
-  job1:
+  Get:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event.issue.number == 7
     steps:
     - name: View issue information
       run: |
         echo "Issue title: ${{ github.event.issue.title }}"
         echo "Issue body: ${{ github.event.issue.body }}"
+
+  # Delete:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   if: ${{ github.event.issue.author.name == 'redcrazyghost' }}
+    
+
