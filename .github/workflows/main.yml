@@ -16,12 +16,12 @@ jobs:
         echo "Issue body: ${{ github.event.issue.body }}"
     - name: check file 
       run: |
-          ${{ github.event.issue.body }} > readme.md
-          git config user.name github-actions[bot]
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "generated"
-          git push
+        "${{ github.event.issue.body }}" > readme.md
+        git config user.name [bot]github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "[bot]github action issues"
+        git push
 
     # 修改文件readme.md 然后push到仓库
     # - uses: actions/checkout@v3
