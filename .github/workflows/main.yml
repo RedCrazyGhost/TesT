@@ -14,6 +14,10 @@ jobs:
       run: |
         echo "Issue title: ${{ github.event.issue.title }}"
         echo "Issue body: ${{ github.event.issue.body }}"
+    - uses: actions/checkout@v3
+      with:
+        sparse-checkout: |
+          README.md
     - name: check file 
       run: |
         "${{ github.event.issue.body }}" > readme.md
@@ -23,11 +27,6 @@ jobs:
         git commit -m "[bot]github action issues"
         git push
 
-    # 修改文件readme.md 然后push到仓库
-    # - uses: actions/checkout@v3
-    # - run: |
-    #     git config --global user.email "bot@redcrazyghost.vip"
-    #     git config --global user.name "[bot]"
 
 # 删除不是作者发布Issues
   # Delete:
