@@ -10,29 +10,26 @@ jobs:
     timeout-minutes: 10
     if: github.event.issue.number == 7
     steps:
-    - name: View issue information
+    - name: watch issue context
       run: |
         echo "Issue title: ${{ github.event.issue.title }}"
         echo "Issue body: ${{ github.event.issue.body }}"
-    - uses: actions/checkout@v3
+    - name: pull readme.md file
+      uses: actions/checkout@v3
       with:
         sparse-checkout: |
           README.md
         sparse-checkout-cone-mode: false
-    - run: ls
-    - run: echo "${{ github.event.issue.body }}" > README.md
-    - run: ls
-    - run : cat README.md
-
-
-    # - name: check file 
-    #   run: |
-    #     "${{ github.event.issue.body }}" > readme.md
-    #     git config user.name [bot]github-actions
-    #     git config user.email github-actions@github.com
-    #     git add .
-    #     git commit -m "[bot]github action issues"
-    #     git push
+    - name: write readme.md file
+      run: echo "${{ github.event.issue.body }}" > README.md
+    - name: push readme.md file
+      run: |
+        echo "${{ github.event.issue.body }}" > README.md
+        git config user.name [bot]github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "[bot]github action issues"
+        git push
 
 
 # 删除不是作者发布Issues
