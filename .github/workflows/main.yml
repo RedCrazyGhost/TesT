@@ -15,11 +15,11 @@ jobs:
         echo "Issue title: ${{ github.event.issue.title }}"
         echo "Issue body: ${{ github.event.issue.body }}"
     - uses: actions/checkout@v3
-    - run: ｜
-        ls -l
-        "${{ github.event.issue.body }}" > README.md
-        ls -l
-        cat README.md
+    - run: ls
+    - run: ${{ github.event.issue.body }} > README.md
+    - run: ls
+    - run : cat README.md
+
 
     # - name: check file 
     #   run: |
