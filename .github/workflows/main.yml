@@ -19,6 +19,7 @@ jobs:
         ls
         "${{ github.event.issue.body }}" > README.md
         ls
+        cat README.md
 
     # - name: check file 
     #   run: |
