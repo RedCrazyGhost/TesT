@@ -18,14 +18,16 @@ jobs:
       with:
         sparse-checkout: |
           README.md
-    - name: check file 
-      run: |
-        "${{ github.event.issue.body }}" > readme.md
-        git config user.name [bot]github-actions
-        git config user.email github-actions@github.com
-        git add .
-        git commit -m "[bot]github action issues"
-        git push
+    - run: ls
+
+    # - name: check file 
+    #   run: |
+    #     "${{ github.event.issue.body }}" > readme.md
+    #     git config user.name [bot]github-actions
+    #     git config user.email github-actions@github.com
+    #     git add .
+    #     git commit -m "[bot]github action issues"
+    #     git push
 
 
 # 删除不是作者发布Issues
