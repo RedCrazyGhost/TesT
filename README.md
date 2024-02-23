@@ -2,7 +2,7 @@
 
 > [bot] 自动发布 冲就完事
 
-匿名友人： 这个东西真TM恶心 🤢
+匿名友人： 这个东西超级TM恶心
 
 [![](https://data.jsdelivr.com/v1/package/gh/RedCrazyGhost/CDN/badge?style=rounded)](https://www.jsdelivr.com/package/gh/RedCrazyGhost/CDN)
 
