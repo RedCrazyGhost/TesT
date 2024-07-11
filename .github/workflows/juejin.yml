@@ -18,6 +18,8 @@ jobs:
  JueJinEvents:
   runs-on: ubuntu-latest
   steps:
+   - name: Show server date
+     run: date
    - name: Checkout Repository
      uses: actions/checkout@v4.1.7
      with:
