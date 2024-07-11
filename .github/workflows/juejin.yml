@@ -27,6 +27,7 @@ jobs:
      working-directory: ./JueJinEvent
      run: go build -o app -ldflags "-w -s" main.go 
    - name: Check Dir
-     run: ll
+     working-directory: ./JueJinEvent
+     run: /bin/ls -l
    - name: Run spider get JueJinEvents
      run: /bin/bash JueJinEvent/app
