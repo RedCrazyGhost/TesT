@@ -13,6 +13,7 @@ env:
  Aid: "2608"
  COOKIE: ${{ vars.COOKIE }}
  TOKEN: ${{ vars.X_SECSDK_CSRF_TOKEN }}
+ SECRET: ${{ vars.SECRET}}
 
 jobs:
  JueJinEvents:
