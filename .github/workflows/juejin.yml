@@ -5,16 +5,19 @@ on:
 
 env:
  TZ: Asia/Shanghai
+ BODY: '{"from_date":"2024-06-30","days":30,"aid":2608}'
+ COOKIE: ${{ vars.COOKIE }}
+ TOKEN: ${{ vars.X_SECSDK_CSRF_TOKEN }}
 
 jobs:
  build:
   runs-on: ubuntu-latest
   steps:
-   # - name: Checkout Repository
-   #   uses: actions/checkout@v4.1.7
-   - name: Check Env
-     run: echo "${{ vars.COOKIE }} ${{ vars.X_SECSDK_CSRF_TOKEN }}"
-   # - name: Run spider get JueJinEvents
-   #   run: /bin/bash JueJinEvent 
-   #   env:
-   #    JUEJIN_COOKIES: 
+   - name: Checkout Repository
+     uses: actions/checkout@v4.1.7
+     with:
+      sparse-checkout: |
+       JueJinEvent
+      sparse-checkout-cone-mode: false
+   - name: Run spider get JueJinEvents
+     run: /bin/bash JueJinEvent
