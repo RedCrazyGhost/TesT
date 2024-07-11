@@ -13,7 +13,7 @@ jobs:
    # - name: Checkout Repository
    #   uses: actions/checkout@v4.1.7
    - name: Check Env
-     run: echo "${{ vars.COOKIE }} ${{ X_SECSDK_CSRF_TOKEN }}"
+     run: echo "${{ vars.COOKIE }} ${{ vars.X_SECSDK_CSRF_TOKEN }}"
    # - name: Run spider get JueJinEvents
    #   run: /bin/bash JueJinEvent 
    #   env:
