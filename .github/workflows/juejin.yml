@@ -1,6 +1,9 @@
 name: JueJinEvents
 
 on:
+ schedule:
+  - cron: "0 10 * * 5"
+  
  workflow_dispatch:
 
 env:
