@@ -5,7 +5,9 @@ on:
 
 env:
  TZ: Asia/Shanghai
- BODY: '{"from_date":"2024-06-30","days":30,"aid":2608}'
+ FromDate: "2024-06-30"
+ Days: "30"
+ Aid: "2608"
  COOKIE: ${{ vars.COOKIE }}
  TOKEN: ${{ vars.X_SECSDK_CSRF_TOKEN }}
 
