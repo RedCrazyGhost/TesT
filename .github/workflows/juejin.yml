@@ -10,7 +10,7 @@ env:
  TOKEN: ${{ vars.X_SECSDK_CSRF_TOKEN }}
 
 jobs:
- build:
+ JueJinEvents:
   runs-on: ubuntu-latest
   steps:
    - name: Checkout Repository
@@ -19,5 +19,12 @@ jobs:
       sparse-checkout: |
        JueJinEvent
       sparse-checkout-cone-mode: false
+   - name: Setup Go environment
+     uses: actions/setup-go@v5
+     with:
+      go-version: '1.22.5'
+   - name: Build App 
+     working-directory: ./JueJinEvent
+     run: go build -o app -ldflags "-w -s" main.go 
    - name: Run spider get JueJinEvents
-     run: /bin/bash JueJinEvent
+     run: /bin/bash JueJinEvent/app
