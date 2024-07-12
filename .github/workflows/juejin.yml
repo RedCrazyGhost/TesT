@@ -8,12 +8,6 @@ on:
 
 env:
  TZ: Asia/Shanghai
- FromDate: "2024-06-30"
- Days: "30"
- Aid: "2608"
- COOKIE: ${{ vars.COOKIE }}
- TOKEN: ${{ vars.X_SECSDK_CSRF_TOKEN }}
- SECRET: ${{ vars.SECRET}}
 
 jobs:
  JueJinEvents:
@@ -40,3 +34,9 @@ jobs:
    - name: Run spider get JueJinEvents\
      working-directory: ./JueJinEvent
      run: ./app
+     env:
+      Days: "30"
+      Aid: "2608"
+      COOKIE: ${{ secrets.COOKIE }}
+      TOKEN: ${{ secrets.X_SECSDK_CSRF_TOKEN }}
+      SECRET: ${{ secrets.SECRET}}
