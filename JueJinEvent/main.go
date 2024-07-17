@@ -7,10 +7,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
+    "io"
 	"net/http"
 	"os"
-	"strconv"
+    "strconv"
 	"time"
 )
 
@@ -28,6 +28,49 @@ type ClientConn struct {
 	RequestBody  any
 	ResponseData any
 }
+
+type LeetCodeRequestBody struct {
+	OperationName string `json:"operationName"`
+	Query         string `json:"query"`
+}
+
+type LeetCodeResponseData struct {
+	Data struct {
+		TodayRecord []struct {
+			Date       string `json:"date"`
+			UserStatus any    `json:"userStatus"`
+			Question   struct {
+				QuestionID         string  `json:"questionId"`
+				FrontendQuestionID string  `json:"frontendQuestionId"`
+				Difficulty         string  `json:"difficulty"`
+				Title              string  `json:"title"`
+				TitleCn            string  `json:"titleCn"`
+				TitleSlug          string  `json:"titleSlug"`
+				PaidOnly           bool    `json:"paidOnly"`
+				FreqBar            any     `json:"freqBar"`
+				IsFavor            bool    `json:"isFavor"`
+				AcRate             float64 `json:"acRate"`
+				Status             any     `json:"status"`
+				SolutionNum        int     `json:"solutionNum"`
+				HasVideoSolution   bool    `json:"hasVideoSolution"`
+				TopicTags          []struct {
+					Name           string `json:"name"`
+					NameTranslated string `json:"nameTranslated"`
+					ID             string `json:"id"`
+				} `json:"topicTags"`
+				Extra struct {
+					TopCompanyTags []struct {
+						ImgURL        string `json:"imgUrl"`
+						Slug          string `json:"slug"`
+						NumSubscribed int    `json:"numSubscribed"`
+					} `json:"topCompanyTags"`
+				} `json:"extra"`
+			} `json:"question"`
+			LastSubmission any `json:"lastSubmission"`
+		} `json:"todayRecord"`
+	} `json:"data"`
+}
+
 
 type JueJinEventResponseData struct {
 	ErrNo  int    `json:"err_no"`
@@ -59,6 +102,21 @@ type FeishuResponseData struct {
 	Data any    `json:"data"`
 }
 
+type DoubanResponseData struct {
+	Subjects []struct {
+		EpisodesInfo string `json:"episodes_info"`
+		Rate         string `json:"rate"`
+		CoverX       int    `json:"cover_x"`
+		Title        string `json:"title"`
+		URL          string `json:"url"`
+		Playable     bool   `json:"playable"`
+		Cover        string `json:"cover"`
+		ID           string `json:"id"`
+		CoverY       int    `json:"cover_y"`
+		IsNew        bool   `json:"is_new"`
+	} `json:"subjects"`
+}
+
 var Client *http.Client
 
 func init() {
@@ -67,6 +125,30 @@ func init() {
 
 func main() {
 	FeishuNotify(JueJinEvent())
+	FeishuNotify(DoubanMoive())
+	FeishuNotify(LeetCodeDaily())
+}
+
+func DoubanMovie2() *DoubanResponseData {
+// https://movie.douban.com/cinema/nowplaying/shanghai/
+	return nil
+}
+
+func DoubanMoive() *DoubanResponseData {
+	var outData *DoubanResponseData
+	conn := ClientConn{
+		*Client,
+		"GET",
+		"https://movie.douban.com/j/search_subjects?type=movie&tag=%E7%83%AD%E9%97%A8&page_limit=10&page_start=0",
+		map[string]string{
+			"User-Agent":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+			"Host":"movie.douban.com"},
+		nil,
+		&outData,
+	}
+	conn.Do()
+	
+	return outData
 }
 
 func JueJinEvent() *JueJinEventResponseData {
@@ -101,21 +183,59 @@ func JueJinEvent() *JueJinEventResponseData {
 	return outData
 }
 
+func LeetCodeDaily() *LeetCodeResponseData {
+	body := &LeetCodeRequestBody{
+		"questionOfToday",
+		"\n    query questionOfToday {\n  todayRecord {\n    date\n    userStatus\n    question {\n      questionId\n      frontendQuestionId: questionFrontendId\n      difficulty\n      title\n      titleCn: translatedTitle\n      titleSlug\n      paidOnly: isPaidOnly\n      freqBar\n      isFavor\n      acRate\n      status\n      solutionNum\n      hasVideoSolution\n      topicTags {\n        name\n        nameTranslated: translatedName\n        id\n      }\n      extra {\n        topCompanyTags {\n          imgUrl\n          slug\n          numSubscribed\n        }\n      }\n    }\n    lastSubmission {\n      id\n    }\n  }\n}\n ",
+	}
+	
+	var outData *LeetCodeResponseData
+	conn := ClientConn{
+		*Client,
+		"POST",
+		"https://leetcode.cn/graphql/",
+		map[string]string{
+			"Content-Type":	"application/json",
+			"Host":"leetcode.cn",
+			"User-Agent":"Apifox/1.0.0 (https://apifox.com)",
+		},
+		body,
+		&outData,
+	}
+	conn.Do()
+	
+	return outData
+}
+
 func FeishuNotify(inData any) {
-	data := inData.(*JueJinEventResponseData)
+	var text string
+	
+    switch data := inData.(type) {
+    case *JueJinEventResponseData:
+		for _, d := range data.Datas {
+			for _, event := range d.Events {
+				text += fmt.Sprintf("%s %s %s\n", d.Date, event.Title, event.URL)
+			}
+		}
+	case *DoubanResponseData:
+        for _, movie := range data.Subjects {
+            text += fmt.Sprintf("%s %s %s %s %v\n",movie.Title ,movie.Rate ,movie.EpisodesInfo,movie.URL,movie.IsNew)
+        }
+    case *LeetCodeResponseData:
+        text += fmt.Sprintf("%s %s %s",
+			data.Data.TodayRecord[0].Question.QuestionID,
+			data.Data.TodayRecord[0].Question.TitleCn,
+			data.Data.TodayRecord[0].Question.Difficulty,
+			)
+        
+	}
+	
 
 	secret := os.Getenv("SECRET")
 	timestamp := time.Now().Unix()
 	sign, err := FeishuGenSign(secret, timestamp)
 	if err != nil {
 		panic(err)
-	}
-
-	var text string
-	for _, d := range data.Datas {
-		for _, event := range d.Events {
-			text += fmt.Sprintf("%s %s %s\n", d.Date, event.Title, event.URL)
-		}
 	}
 
 	body := &FeishuRequestBody{
@@ -140,6 +260,7 @@ func FeishuNotify(inData any) {
 	conn.Do()
 }
 
+
 func FeishuGenSign(secret string, timestamp int64) (string, error) {
 	//timestamp + key 做sha256, 再进行base64 encode
 	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
@@ -158,21 +279,29 @@ func FeishuGenSign(secret string, timestamp int64) (string, error) {
 func (c *ClientConn) Do() any {
 	fmt.Printf("%#v\n", c.RequestBody)
 
-	bodyBytes, err := json.Marshal(c.RequestBody)
+	var req *http.Request
+	var resp *http.Response
+	var buffer *bytes.Buffer
+	var bodyBytes []byte
+	var err error
+	
+	if c.RequestBody != nil {
+		bodyBytes, err = json.Marshal(c.RequestBody)
+		if err != nil {
+			panic(err)
+		}
+	}
+	buffer = bytes.NewBuffer(bodyBytes)
+	req, err = http.NewRequest(c.Method, c.URL, buffer)
 	if err != nil {
 		panic(err)
 	}
-	buffer := bytes.NewBuffer(bodyBytes)
-	req, err := http.NewRequest(c.Method, c.URL, buffer)
-	if err != nil {
-		panic(err)
-	}
-
+	
 	for k, v := range c.Header {
 		req.Header.Set(k, v)
 	}
-
-	resp, err := c.C.Do(req)
+	
+	resp, err = c.C.Do(req)
 	if err != nil {
 		panic(err)
 	}
@@ -184,6 +313,7 @@ func (c *ClientConn) Do() any {
 	}
 
 	if err = json.Unmarshal(responseBody, &c.ResponseData); err != nil {
+		fmt.Println(string(responseBody))
 		panic(err)
 	}
 
