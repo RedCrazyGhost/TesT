@@ -7,10 +7,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-    "io"
+	"io"
 	"net/http"
 	"os"
-    "strconv"
+	"strconv"
 	"time"
 )
 
@@ -71,7 +71,6 @@ type LeetCodeResponseData struct {
 	} `json:"data"`
 }
 
-
 type JueJinEventResponseData struct {
 	ErrNo  int    `json:"err_no"`
 	ErrMsg string `json:"err_msg"`
@@ -130,7 +129,7 @@ func main() {
 }
 
 func DoubanMovie2() *DoubanResponseData {
-// https://movie.douban.com/cinema/nowplaying/shanghai/
+	// https://movie.douban.com/cinema/nowplaying/shanghai/
 	return nil
 }
 
@@ -141,13 +140,13 @@ func DoubanMoive() *DoubanResponseData {
 		"GET",
 		"https://movie.douban.com/j/search_subjects?type=movie&tag=%E7%83%AD%E9%97%A8&page_limit=10&page_start=0",
 		map[string]string{
-			"User-Agent":"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-			"Host":"movie.douban.com"},
+			"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+			"Host":       "movie.douban.com"},
 		nil,
 		&outData,
 	}
 	conn.Do()
-	
+
 	return outData
 }
 
@@ -188,48 +187,47 @@ func LeetCodeDaily() *LeetCodeResponseData {
 		"questionOfToday",
 		"\n    query questionOfToday {\n  todayRecord {\n    date\n    userStatus\n    question {\n      questionId\n      frontendQuestionId: questionFrontendId\n      difficulty\n      title\n      titleCn: translatedTitle\n      titleSlug\n      paidOnly: isPaidOnly\n      freqBar\n      isFavor\n      acRate\n      status\n      solutionNum\n      hasVideoSolution\n      topicTags {\n        name\n        nameTranslated: translatedName\n        id\n      }\n      extra {\n        topCompanyTags {\n          imgUrl\n          slug\n          numSubscribed\n        }\n      }\n    }\n    lastSubmission {\n      id\n    }\n  }\n}\n ",
 	}
-	
+
 	var outData *LeetCodeResponseData
 	conn := ClientConn{
 		*Client,
 		"POST",
 		"https://leetcode.cn/graphql/",
 		map[string]string{
-			"Content-Type":	"application/json",
-			"Host":"leetcode.cn",
-			"User-Agent":"Apifox/1.0.0 (https://apifox.com)",
+			"Content-Type": "application/json",
+			"Host":         "leetcode.cn",
+			"User-Agent":   "Apifox/1.0.0 (https://apifox.com)",
 		},
 		body,
 		&outData,
 	}
 	conn.Do()
-	
+
 	return outData
 }
 
 func FeishuNotify(inData any) {
 	var text string
-	
-    switch data := inData.(type) {
-    case *JueJinEventResponseData:
+
+	switch data := inData.(type) {
+	case *JueJinEventResponseData:
 		for _, d := range data.Datas {
 			for _, event := range d.Events {
 				text += fmt.Sprintf("%s %s %s\n", d.Date, event.Title, event.URL)
 			}
 		}
 	case *DoubanResponseData:
-        for _, movie := range data.Subjects {
-            text += fmt.Sprintf("%s %s %s %s %v\n",movie.Title ,movie.Rate ,movie.EpisodesInfo,movie.URL,movie.IsNew)
-        }
-    case *LeetCodeResponseData:
-        text += fmt.Sprintf("%s %s %s",
+		for _, movie := range data.Subjects {
+			text += fmt.Sprintf("%s %s %s %s %v\n", movie.Title, movie.Rate, movie.EpisodesInfo, movie.URL, movie.IsNew)
+		}
+	case *LeetCodeResponseData:
+		text += fmt.Sprintf("%s %s %s",
 			data.Data.TodayRecord[0].Question.QuestionID,
 			data.Data.TodayRecord[0].Question.TitleCn,
 			data.Data.TodayRecord[0].Question.Difficulty,
-			)
-        
+		)
+
 	}
-	
 
 	secret := os.Getenv("SECRET")
 	timestamp := time.Now().Unix()
@@ -260,7 +258,6 @@ func FeishuNotify(inData any) {
 	conn.Do()
 }
 
-
 func FeishuGenSign(secret string, timestamp int64) (string, error) {
 	//timestamp + key 做sha256, 再进行base64 encode
 	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
@@ -284,7 +281,7 @@ func (c *ClientConn) Do() any {
 	var buffer *bytes.Buffer
 	var bodyBytes []byte
 	var err error
-	
+
 	if c.RequestBody != nil {
 		bodyBytes, err = json.Marshal(c.RequestBody)
 		if err != nil {
@@ -296,11 +293,11 @@ func (c *ClientConn) Do() any {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	for k, v := range c.Header {
 		req.Header.Set(k, v)
 	}
-	
+
 	resp, err = c.C.Do(req)
 	if err != nil {
 		panic(err)
