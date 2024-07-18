@@ -123,7 +123,7 @@ func init() {
 }
 
 func main() {
-	FeishuNotify(JueJinEvent())
+	// FeishuNotify(JueJinEvent())
 	FeishuNotify(DoubanMoive())
 	FeishuNotify(LeetCodeDaily())
 }
